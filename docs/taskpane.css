@@ -157,6 +157,19 @@ select:focus {
     gap: 10px;
 }
 
+.advanced {
+    margin-top: 14px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.advanced summary {
+    cursor: pointer;
+    color: var(--secondary);
+    font-size: 13px;
+    font-weight: 750;
+}
+
 .check {
     display: flex;
     align-items: center;
@@ -184,7 +197,7 @@ select:focus {
 
 .utility-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 10px;
     margin-top: 14px;
 }

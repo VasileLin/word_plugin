@@ -21,6 +21,9 @@ type TextPattern = {
 };
 
 const STORAGE_KEY = "word_text_patterns";
+const LAST_TAB_KEY = "word_text_patterns_last_tab";
+const LAST_SCOPE_KEY = "word_text_patterns_last_scope";
+const SORT_KEY = "word_text_patterns_sort";
 let editingPatternName: string | null = null;
 
 Office.onReady(() => {
@@ -39,11 +42,14 @@ Office.onReady(() => {
   document.getElementById("deletePatternButton")?.addEventListener("click", deleteSelectedPattern);
   document.getElementById("exportPatternsButton")?.addEventListener("click", exportPatterns);
   document.getElementById("importPatternsButton")?.addEventListener("click", openImportDialog);
+  document.getElementById("resetDefaultsButton")?.addEventListener("click", resetDefaultPatterns);
   document.getElementById("importPatternsFile")?.addEventListener("change", importPatternsFromFile);
   document
     .getElementById("duplicatePatternButton")
     ?.addEventListener("click", duplicateSelectedPattern);
   document.getElementById("patternSearch")?.addEventListener("input", renderSavedPatterns);
+  document.getElementById("patternSort")?.addEventListener("change", handlePatternSortChange);
+  document.getElementById("applyScope")?.addEventListener("change", persistApplyScope);
   document.getElementById("savedPatterns")?.addEventListener("change", updatePatternPreview);
   document
     .getElementById("editPatternButton")
@@ -51,7 +57,16 @@ Office.onReady(() => {
 });
 
 function setupTabs(): void {
-  switchTab("new");
+  const savedTab = localStorage.getItem(LAST_TAB_KEY);
+  const savedScope = localStorage.getItem(LAST_SCOPE_KEY);
+  const savedSort = localStorage.getItem(SORT_KEY);
+
+  setInputValue(
+    "applyScope",
+    savedScope === "paragraph" || savedScope === "document" ? savedScope : "selection"
+  );
+  setInputValue("patternSort", savedSort === "za" ? "za" : "az");
+  switchTab(savedTab === "saved" ? "saved" : "new");
 }
 
 function switchTab(tab: "new" | "saved"): void {
@@ -69,6 +84,7 @@ function switchTab(tab: "new" | "saved"): void {
   savedPanel?.classList.toggle("active", !isNew);
   newPanel?.toggleAttribute("hidden", !isNew);
   savedPanel?.toggleAttribute("hidden", isNew);
+  localStorage.setItem(LAST_TAB_KEY, tab);
 }
 
 function loadSelectedPatternForEditing(): void {
@@ -177,7 +193,11 @@ function initializeDefaultPatterns(): void {
     return;
   }
 
-  savePatterns([
+  savePatterns(getDefaultPatterns());
+}
+
+function getDefaultPatterns(): TextPattern[] {
+  return [
     createPattern({
       name: "Academic Body",
       fontName: "Times New Roman",
@@ -214,7 +234,22 @@ function initializeDefaultPatterns(): void {
       alignment: "Left",
       lineSpacing: 1,
     }),
-  ]);
+  ];
+}
+
+function resetDefaultPatterns(): void {
+  if (
+    !window.confirm(
+      "Restore default presets? Existing patterns with the same names will be replaced."
+    )
+  ) {
+    return;
+  }
+
+  savePatterns(mergePatterns(getPatterns(), getDefaultPatterns()));
+  renderSavedPatterns();
+  switchTab("saved");
+  showMessage("Default presets were restored.");
 }
 
 function createPattern(pattern: Partial<TextPattern> & { name: string }): TextPattern {
@@ -378,7 +413,7 @@ function renderSavedPatterns(): void {
 
 function getFilteredPatterns(): TextPattern[] {
   const query = getInputValue("patternSearch").trim().toLowerCase();
-  const patterns = getPatterns();
+  const patterns = getSortedPatterns(getPatterns());
 
   if (!query) {
     return patterns;
@@ -397,6 +432,24 @@ function getFilteredPatterns(): TextPattern[] {
       .toLowerCase()
       .includes(query)
   );
+}
+
+function getSortedPatterns(patterns: TextPattern[]): TextPattern[] {
+  const sort = getInputValue("patternSort");
+
+  return [...patterns].sort((first, second) => {
+    const comparison = first.name.localeCompare(second.name);
+    return sort === "za" ? -comparison : comparison;
+  });
+}
+
+function handlePatternSortChange(): void {
+  localStorage.setItem(SORT_KEY, getInputValue("patternSort"));
+  renderSavedPatterns();
+}
+
+function persistApplyScope(): void {
+  localStorage.setItem(LAST_SCOPE_KEY, getInputValue("applyScope"));
 }
 
 function getSelectedPattern(): TextPattern | null {
@@ -567,6 +620,11 @@ async function applySelectedPattern(): Promise<void> {
         return;
       }
 
+      if (scope === "paragraph") {
+        await applyPatternToCurrentParagraph(context, pattern);
+        return;
+      }
+
       const selection = context.document.getSelection();
 
       applyFontSettings(selection, pattern);
@@ -590,12 +648,43 @@ async function applySelectedPattern(): Promise<void> {
     showMessage(
       scope === "document"
         ? "The pattern was applied to the whole document."
-        : "The pattern was applied to the selected text."
+        : scope === "paragraph"
+          ? "The pattern was applied to the current paragraph."
+          : "The pattern was applied to the selected text."
     );
   } catch (error) {
     showMessage("An error occurred while applying the pattern.");
     console.error(error);
   }
+}
+
+async function applyPatternToCurrentParagraph(
+  context: Word.RequestContext,
+  pattern: TextPattern
+): Promise<void> {
+  const selection = context.document.getSelection();
+
+  // eslint-disable-next-line office-addins/no-navigational-load
+  selection.load("paragraphs");
+
+  await context.sync();
+
+  const paragraphs = selection.paragraphs;
+  paragraphs.load("items");
+
+  await context.sync();
+
+  if (paragraphs.items.length === 0) {
+    return;
+  }
+
+  const paragraph = paragraphs.items[0];
+  const range = paragraph.getRange();
+
+  applyFontSettings(range, pattern);
+  applyParagraphSettings(paragraph, pattern);
+
+  await context.sync();
 }
 
 async function applyPatternToDocument(
@@ -788,6 +877,14 @@ function parseImportedPatterns(contents: string): TextPattern[] {
     lineSpacing: Number(pattern.lineSpacing),
     bold: pattern.bold === true,
     italic: pattern.italic === true,
+    underline: pattern.underline === true,
+    textColor: pattern.textColor || "#000000",
+    highlightColor: pattern.highlightColor || "",
+    spaceBefore: Number(pattern.spaceBefore) || 0,
+    spaceAfter: Number(pattern.spaceAfter) || 0,
+    leftIndent: Number(pattern.leftIndent) || 0,
+    rightIndent: Number(pattern.rightIndent) || 0,
+    firstLineIndent: Number(pattern.firstLineIndent) || 0,
   }));
 }
 

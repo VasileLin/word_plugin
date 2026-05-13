@@ -261,6 +261,46 @@ select:focus {
     line-height: 1.35;
 }
 
+.toast-container {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    z-index: 20;
+    display: grid;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.toast {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--secondary);
+    color: #ffffff;
+    box-shadow: 0 8px 22px rgba(30, 37, 43, 0.18);
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 1.35;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: toast-in 180ms ease forwards;
+}
+
+.toast.leaving {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
+}
+
+@keyframes toast-in {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .preview {
     margin-top: 14px;
     padding: 12px;

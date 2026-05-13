@@ -1,4 +1,4 @@
-/* global Office, Word, document, HTMLInputElement, HTMLSelectElement, HTMLElement, localStorage, console, Blob, URL, FileReader, window */
+/* global Office, Word, document, HTMLInputElement, HTMLSelectElement, HTMLElement, localStorage, console, Blob, URL, FileReader, setTimeout */
 
 type AlignmentValue = "Left" | "Centered" | "Right" | "Justified";
 
@@ -167,6 +167,29 @@ function showMessage(message: string): void {
   if (messageElement) {
     messageElement.textContent = message;
   }
+
+  showToast(message);
+}
+
+function showToast(message: string): void {
+  const toastContainer = document.getElementById("toastContainer");
+
+  if (!toastContainer) {
+    return;
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("leaving");
+
+    setTimeout(() => {
+      toast.remove();
+    }, 180);
+  }, 2600);
 }
 
 function getPatterns(): TextPattern[] {
@@ -238,16 +261,13 @@ function getDefaultPatterns(): TextPattern[] {
 }
 
 function resetDefaultPatterns(): void {
-  if (
-    !window.confirm(
-      "Restore default presets? Existing patterns with the same names will be replaced."
-    )
-  ) {
-    return;
-  }
-
   savePatterns(mergePatterns(getPatterns(), getDefaultPatterns()));
+  setInputValue("patternSearch", "");
+  setInputValue("patternSort", "az");
+  localStorage.setItem(SORT_KEY, "az");
   renderSavedPatterns();
+  setInputValue("savedPatterns", "Academic Body");
+  updatePatternPreview();
   switchTab("saved");
   showMessage("Default presets were restored.");
 }
@@ -347,6 +367,7 @@ function savePattern(): void {
   }
 
   const patterns = getPatterns();
+  let message = "The pattern was added.";
 
   if (editingPatternName) {
     const index = patterns.findIndex((p) => p.name === editingPatternName);
@@ -358,15 +379,13 @@ function savePattern(): void {
     }
 
     editingPatternName = null;
+    message = "The pattern was updated.";
   } else {
     const existingIndex = patterns.findIndex((p) => p.name === pattern.name);
 
     if (existingIndex >= 0) {
-      if (!window.confirm(`Overwrite "${pattern.name}"?`)) {
-        return;
-      }
-
       patterns[existingIndex] = pattern;
+      message = "The existing pattern was updated.";
     } else {
       patterns.push(pattern);
     }
@@ -378,7 +397,7 @@ function savePattern(): void {
   updatePatternPreview();
   switchTab("saved");
 
-  showMessage("The pattern was saved.");
+  showMessage(message);
 }
 
 function renderSavedPatterns(): void {
@@ -774,25 +793,21 @@ function normalizeHighlightColor(value: string | undefined): string {
 }
 
 function deleteSelectedPattern(): void {
-  const selectedName = getInputValue("savedPatterns");
+  const pattern = getSelectedPattern();
 
-  if (!selectedName) {
+  if (!pattern) {
     showMessage("Choose a pattern to delete.");
     return;
   }
 
-  if (!window.confirm(`Delete "${selectedName}"?`)) {
-    return;
-  }
-
   const patterns = getPatterns();
-  const updatedPatterns = patterns.filter((pattern) => pattern.name !== selectedName);
+  const updatedPatterns = patterns.filter((savedPattern) => savedPattern.name !== pattern.name);
 
   savePatterns(updatedPatterns);
   renderSavedPatterns();
-  editingPatternName = null;
+  editingPatternName = editingPatternName === pattern.name ? null : editingPatternName;
 
-  showMessage("The pattern was deleted.");
+  showMessage(`"${pattern.name}" was deleted.`);
 }
 
 function exportPatterns(): void {

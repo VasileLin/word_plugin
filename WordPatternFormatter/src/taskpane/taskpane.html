@@ -81,11 +81,61 @@
                     <input id="italic" type="checkbox" />
                     <span>Italic</span>
                 </label>
+
+                <label class="check">
+                    <input id="underline" type="checkbox" />
+                    <span>Underline</span>
+                </label>
+            </div>
+
+            <div class="grid">
+                <div>
+                    <label for="textColor">Text color</label>
+                    <input id="textColor" type="color" value="#000000" />
+                </div>
+
+                <div>
+                    <label for="highlightColor">Highlight</label>
+                    <select id="highlightColor">
+                        <option value="">None</option>
+                        <option value="#ffff00">Yellow</option>
+                        <option value="#92d050">Green</option>
+                        <option value="#00b0f0">Blue</option>
+                        <option value="#ff99cc">Pink</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="paragraph-grid">
+                <div>
+                    <label for="spaceBefore">Before</label>
+                    <input id="spaceBefore" type="number" value="0" min="0" max="72" step="1" />
+                </div>
+                <div>
+                    <label for="spaceAfter">After</label>
+                    <input id="spaceAfter" type="number" value="0" min="0" max="72" step="1" />
+                </div>
+                <div>
+                    <label for="leftIndent">Left indent</label>
+                    <input id="leftIndent" type="number" value="0" min="0" max="144" step="1" />
+                </div>
+                <div>
+                    <label for="rightIndent">Right indent</label>
+                    <input id="rightIndent" type="number" value="0" min="0" max="144" step="1" />
+                </div>
+                <div>
+                    <label for="firstLineIndent">First line</label>
+                    <input id="firstLineIndent" type="number" value="0" min="-72" max="144" step="1" />
+                </div>
             </div>
 
             <div class="actions">
                 <button id="readSelectionButton" class="button secondary" type="button">
                     Read from selection
+                </button>
+
+                <button id="clearFormButton" class="button ghost" type="button">
+                    Clear form
                 </button>
 
                 <button id="savePatternButton" class="button primary" type="button">
@@ -100,8 +150,31 @@
                 <p>Select a pattern and apply it to the current Word selection.</p>
             </div>
 
+            <label for="patternSearch">Search patterns</label>
+            <input id="patternSearch" type="search" placeholder="Filter by name, font, or style" />
+
             <label for="savedPatterns">Choose pattern</label>
             <select id="savedPatterns"></select>
+
+            <div id="patternPreview" class="preview" aria-live="polite">
+                <p class="preview-empty">No pattern selected.</p>
+            </div>
+
+            <label for="applyScope">Apply to</label>
+            <select id="applyScope">
+                <option value="selection">Selected text</option>
+                <option value="document">Whole document</option>
+            </select>
+
+            <div class="utility-actions">
+                <button id="exportPatternsButton" class="button ghost" type="button">
+                    Export JSON
+                </button>
+                <button id="importPatternsButton" class="button ghost" type="button">
+                    Import JSON
+                </button>
+            </div>
+            <input id="importPatternsFile" class="file-input" type="file" accept="application/json,.json" />
 
             <div class="actions">
                 <button id="applyPatternButton" class="button primary" type="button">
@@ -109,6 +182,9 @@
                 </button>
                 <button id="editPatternButton" class="button secondary" type="button">
                     Edit pattern
+                </button>
+                <button id="duplicatePatternButton" class="button ghost" type="button">
+                    Duplicate pattern
                 </button>
                 <button id="deletePatternButton" class="button danger" type="button">
                     Delete pattern

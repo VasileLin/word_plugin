@@ -146,9 +146,15 @@ select:focus {
 
 .options {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
     margin-top: 14px;
+}
+
+.paragraph-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
 }
 
 .check {
@@ -174,6 +180,17 @@ select:focus {
     display: grid;
     gap: 10px;
     margin-top: 16px;
+}
+
+.utility-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.file-input {
+    display: none;
 }
 
 .button {
@@ -204,6 +221,16 @@ select:focus {
     background: #151d23;
 }
 
+.ghost {
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--secondary);
+}
+
+.ghost:hover {
+    background: #f3f5f4;
+}
+
 .danger {
     background: var(--danger);
 }
@@ -219,4 +246,41 @@ select:focus {
     font-size: 13px;
     font-weight: 700;
     line-height: 1.35;
+}
+
+.preview {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fafbf9;
+}
+
+.preview-empty {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.preview-sample {
+    margin: 0 0 10px;
+    color: var(--text);
+    line-height: 1.35;
+}
+
+.preview-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.preview-chip {
+    padding: 4px 7px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
 }

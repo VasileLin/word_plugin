@@ -1,0 +1,319 @@
+type AlignmentValue = "Left" | "Centered" | "Right" | "Justified";
+
+type TextPattern = {
+  name: string;
+  fontName: string;
+  fontSize: number;
+  alignment: AlignmentValue;
+  lineSpacing: number;
+  bold: boolean;
+  italic: boolean;
+};
+
+const STORAGE_KEY = "word_text_patterns";
+let editingPatternName: string | null = null;
+
+Office.onReady(() => {
+  renderSavedPatterns();
+
+  document.getElementById("readSelectionButton")?.addEventListener("click", readFormattingFromSelection);
+  document.getElementById("savePatternButton")?.addEventListener("click", savePattern);
+  document.getElementById("applyPatternButton")?.addEventListener("click", applySelectedPattern);
+  document.getElementById("deletePatternButton")?.addEventListener("click", deleteSelectedPattern);
+  document.getElementById("editPatternButton")?.addEventListener("click", loadSelectedPatternForEditing);
+});
+
+function loadSelectedPatternForEditing(): void {
+  const pattern = getSelectedPattern();
+
+  if (!pattern) {
+    showMessage("Alege un pattern pentru editare.");
+    return;
+  }
+
+  editingPatternName = pattern.name;
+
+  setInputValue("patternName", pattern.name);
+  setInputValue("fontName", pattern.fontName);
+  setInputValue("fontSize", String(pattern.fontSize));
+  setInputValue("alignment", pattern.alignment);
+  setInputValue("lineSpacing", String(convertWordPointsToLineSpacing(pattern.lineSpacing)));
+  setCheckboxValue("bold", pattern.bold);
+  setCheckboxValue("italic", pattern.italic);
+
+  showMessage("Patternul a fost încărcat pentru editare.");
+}
+
+function getInputValue(id: string): string {
+  const element = document.getElementById(id) as HTMLInputElement | HTMLSelectElement;
+  return element.value;
+}
+
+function setInputValue(id: string, value: string): void {
+  const element = document.getElementById(id) as HTMLInputElement | HTMLSelectElement;
+
+  if (element) {
+    element.value = value;
+  }
+}
+
+function getCheckboxValue(id: string): boolean {
+  const element = document.getElementById(id) as HTMLInputElement;
+  return element.checked;
+}
+
+function setCheckboxValue(id: string, value: boolean): void {
+  const element = document.getElementById(id) as HTMLInputElement;
+
+  if (element) {
+    element.checked = value;
+  }
+}
+
+function showMessage(message: string): void {
+  const messageElement = document.getElementById("message");
+
+  if (messageElement) {
+    messageElement.textContent = message;
+  }
+}
+
+function getPatterns(): TextPattern[] {
+  const data = localStorage.getItem(STORAGE_KEY);
+
+  if (!data) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(data) as TextPattern[];
+  } catch {
+    return [];
+  }
+}
+
+function savePatterns(patterns: TextPattern[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(patterns));
+}
+
+function buildPatternFromForm(): TextPattern | null {
+  const name = getInputValue("patternName").trim();
+
+  if (!name) {
+    showMessage("Introdu numele patternului.");
+    return null;
+  }
+
+  return {
+    name: name,
+    fontName: getInputValue("fontName"),
+    fontSize: Number(getInputValue("fontSize")),
+    alignment: getInputValue("alignment") as AlignmentValue,
+    lineSpacing: Number(getInputValue("lineSpacing")),
+    bold: getCheckboxValue("bold"),
+    italic: getCheckboxValue("italic")
+  };
+}
+
+function savePattern(): void {
+  const pattern = buildPatternFromForm();
+
+  if (!pattern) {
+    return;
+  }
+
+  const patterns = getPatterns();
+
+  if (editingPatternName) {
+    const index = patterns.findIndex(p => p.name === editingPatternName);
+
+    if (index >= 0) {
+      patterns[index] = pattern;
+    } else {
+      patterns.push(pattern);
+    }
+
+    editingPatternName = null;
+  } else {
+    const existingIndex = patterns.findIndex(p => p.name === pattern.name);
+
+    if (existingIndex >= 0) {
+      patterns[existingIndex] = pattern;
+    } else {
+      patterns.push(pattern);
+    }
+  }
+
+  savePatterns(patterns);
+  renderSavedPatterns();
+  setInputValue("savedPatterns", pattern.name);
+
+  showMessage("Patternul a fost salvat.");
+}
+
+function renderSavedPatterns(): void {
+  const select = document.getElementById("savedPatterns") as HTMLSelectElement;
+
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  const patterns = getPatterns();
+
+  if (patterns.length === 0) {
+    const option = document.createElement("option");
+    option.textContent = "Nu există patternuri salvate";
+    option.value = "";
+    select.appendChild(option);
+    return;
+  }
+
+  patterns.forEach(pattern => {
+    const option = document.createElement("option");
+    option.value = pattern.name;
+    option.textContent = pattern.name;
+    select.appendChild(option);
+  });
+}
+
+function getSelectedPattern(): TextPattern | null {
+  const selectedName = getInputValue("savedPatterns");
+
+  if (!selectedName) {
+    return null;
+  }
+
+  const patterns = getPatterns();
+  return patterns.find(pattern => pattern.name === selectedName) ?? null;
+}
+
+async function readFormattingFromSelection(): Promise<void> {
+  try {
+    await Word.run(async (context) => {
+      const selection = context.document.getSelection();
+
+      selection.font.load("name,size,bold,italic");
+
+      const paragraphs = selection.paragraphs;
+      paragraphs.load("items");
+
+      await context.sync();
+
+      let alignment: AlignmentValue = "Left";
+      let lineSpacing = 12;
+
+      if (paragraphs.items.length > 0) {
+        const firstParagraph = paragraphs.items[0];
+
+        firstParagraph.load("alignment,lineSpacing");
+
+        await context.sync();
+
+        alignment = firstParagraph.alignment as AlignmentValue;
+        lineSpacing = convertWordPointsToLineSpacing(firstParagraph.lineSpacing || 12);
+      }
+
+      const fontName = selection.font.name || "Times New Roman";
+      const fontSize = selection.font.size || 12;
+      const bold = selection.font.bold === true;
+      const italic = selection.font.italic === true;
+
+      if (!getInputValue("patternName").trim()) {
+        setInputValue("patternName", "Pattern din selecție");
+      }
+
+      setInputValue("fontName", fontName);
+      setInputValue("fontSize", String(fontSize));
+      setInputValue("alignment", alignment);
+      setInputValue("lineSpacing", String(lineSpacing));
+      setCheckboxValue("bold", bold);
+      setCheckboxValue("italic", italic);
+
+      showMessage("Formatările au fost preluate din textul selectat.");
+    });
+  } catch (error) {
+    showMessage("Nu am putut prelua formatarea din selecție.");
+    console.error(error);
+  }
+}
+
+async function applySelectedPattern(): Promise<void> {
+  const pattern = getSelectedPattern();
+
+  if (!pattern) {
+    showMessage("Alege un pattern salvat.");
+    return;
+  }
+
+  try {
+    await Word.run(async (context) => {
+      const selection = context.document.getSelection();
+
+      selection.font.name = pattern.fontName;
+      selection.font.size = pattern.fontSize;
+      selection.font.bold = pattern.bold;
+      selection.font.italic = pattern.italic;
+
+      const paragraphs = selection.paragraphs;
+      paragraphs.load("items");
+
+      await context.sync();
+
+      paragraphs.items.forEach(paragraph => {
+        paragraph.alignment = pattern.alignment as Word.Alignment;
+        paragraph.lineSpacing = convertLineSpacingToWordPoints(pattern.lineSpacing);
+      });
+
+      await context.sync();
+    });
+
+    showMessage("Patternul a fost aplicat pe textul selectat.");
+  } catch (error) {
+    showMessage("A apărut o eroare la aplicarea patternului.");
+    console.error(error);
+  }
+}
+
+function convertLineSpacingToWordPoints(value: number): number {
+  if (!value || Number.isNaN(value)) {
+    return 12;
+  }
+
+  if (value > 5) {
+    return value;
+  }
+
+  return value * 12;
+}
+
+function convertWordPointsToLineSpacing(value: number): number {
+  if (!value || Number.isNaN(value)) {
+    return 1;
+  }
+
+  if (value > 5) {
+    return Number((value / 12).toFixed(1));
+  }
+
+  return value;
+}
+
+function deleteSelectedPattern(): void {
+  const selectedName = getInputValue("savedPatterns");
+
+  if (!selectedName) {
+    showMessage("Alege un pattern pentru ștergere.");
+    return;
+  }
+
+  const patterns = getPatterns();
+  const updatedPatterns = patterns.filter(pattern => pattern.name !== selectedName);
+
+  savePatterns(updatedPatterns);
+  renderSavedPatterns();
+  editingPatternName = null;
+
+  showMessage("Patternul a fost șters.");
+}

@@ -13,15 +13,15 @@
     <div class="header">
         <div>
             <h1>Pattern Formatter</h1>
-            <p>Salvează și aplică rapid formatarea pentru textul selectat.</p>
+            <p>Save and apply reusable formatting for the selected text.</p>
         </div>
     </div>
 
     <div class="card">
-        <h2>Pattern nou</h2>
+        <h2>New Pattern</h2>
 
-        <label for="patternName">Nume pattern</label>
-        <input id="patternName" type="text" placeholder="Ex: Text academic" />
+        <label for="patternName">Pattern name</label>
+        <input id="patternName" type="text" placeholder="Example: Academic text" />
 
         <div class="grid">
             <div>
@@ -43,20 +43,20 @@
             </div>
 
             <div>
-                <label for="fontSize">Mărime</label>
+                <label for="fontSize">Size</label>
                 <input id="fontSize" type="number" value="12" min="8" max="72" />
             </div>
         </div>
 
-        <label for="alignment">Aliniere</label>
+        <label for="alignment">Alignment</label>
         <select id="alignment">
-            <option value="Left">Stânga</option>
-            <option value="Centered">Centru</option>
-            <option value="Right">Dreapta</option>
-            <option value="Justified">Justify</option>
+            <option value="Left">Left</option>
+            <option value="Centered">Center</option>
+            <option value="Right">Right</option>
+            <option value="Justified">Justified</option>
         </select>
 
-        <label for="lineSpacing">Spațiere rânduri</label>
+        <label for="lineSpacing">Line spacing</label>
         <input id="lineSpacing" type="number" value="1.5" min="1" max="5" step="0.1" />
 
         <div class="options">
@@ -72,28 +72,28 @@
         </div>
 
         <button id="readSelectionButton" class="button secondary">
-            Preia din selecție
+            Read from selection
         </button>
 
         <button id="savePatternButton" class="button primary">
-            Salvează pattern
+            Save pattern
         </button>
     </div>
 
     <div class="card">
-        <h2>Patternuri salvate</h2>
+        <h2>Saved Patterns</h2>
 
-        <label for="savedPatterns">Alege pattern</label>
+        <label for="savedPatterns">Choose pattern</label>
         <select id="savedPatterns"></select>
 
         <button id="applyPatternButton" class="button primary">
-            Aplică pattern
+            Apply pattern
         </button>
         <button id="editPatternButton" class="button secondary">
-            Editează pattern
+            Edit pattern
         </button>
         <button id="deletePatternButton" class="button danger">
-            Șterge pattern
+            Delete pattern
         </button>
     </div>
 

@@ -1,4 +1,11 @@
 {
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "Office": "readonly",
+    "Word": "readonly"
+  },
   "plugins": [
     "office-addins"
   ],

@@ -1,3 +1,5 @@
+/* global Office, Word, document, HTMLInputElement, HTMLSelectElement, localStorage, console */
+
 type AlignmentValue = "Left" | "Centered" | "Right" | "Justified";
 
 type TextPattern = {
@@ -16,18 +18,22 @@ let editingPatternName: string | null = null;
 Office.onReady(() => {
   renderSavedPatterns();
 
-  document.getElementById("readSelectionButton")?.addEventListener("click", readFormattingFromSelection);
+  document
+    .getElementById("readSelectionButton")
+    ?.addEventListener("click", readFormattingFromSelection);
   document.getElementById("savePatternButton")?.addEventListener("click", savePattern);
   document.getElementById("applyPatternButton")?.addEventListener("click", applySelectedPattern);
   document.getElementById("deletePatternButton")?.addEventListener("click", deleteSelectedPattern);
-  document.getElementById("editPatternButton")?.addEventListener("click", loadSelectedPatternForEditing);
+  document
+    .getElementById("editPatternButton")
+    ?.addEventListener("click", loadSelectedPatternForEditing);
 });
 
 function loadSelectedPatternForEditing(): void {
   const pattern = getSelectedPattern();
 
   if (!pattern) {
-    showMessage("Alege un pattern pentru editare.");
+    showMessage("Choose a pattern to edit.");
     return;
   }
 
@@ -41,7 +47,7 @@ function loadSelectedPatternForEditing(): void {
   setCheckboxValue("bold", pattern.bold);
   setCheckboxValue("italic", pattern.italic);
 
-  showMessage("Patternul a fost încărcat pentru editare.");
+  showMessage("The pattern was loaded for editing.");
 }
 
 function getInputValue(id: string): string {
@@ -100,7 +106,7 @@ function buildPatternFromForm(): TextPattern | null {
   const name = getInputValue("patternName").trim();
 
   if (!name) {
-    showMessage("Introdu numele patternului.");
+    showMessage("Enter a pattern name.");
     return null;
   }
 
@@ -111,7 +117,7 @@ function buildPatternFromForm(): TextPattern | null {
     alignment: getInputValue("alignment") as AlignmentValue,
     lineSpacing: Number(getInputValue("lineSpacing")),
     bold: getCheckboxValue("bold"),
-    italic: getCheckboxValue("italic")
+    italic: getCheckboxValue("italic"),
   };
 }
 
@@ -125,7 +131,7 @@ function savePattern(): void {
   const patterns = getPatterns();
 
   if (editingPatternName) {
-    const index = patterns.findIndex(p => p.name === editingPatternName);
+    const index = patterns.findIndex((p) => p.name === editingPatternName);
 
     if (index >= 0) {
       patterns[index] = pattern;
@@ -135,7 +141,7 @@ function savePattern(): void {
 
     editingPatternName = null;
   } else {
-    const existingIndex = patterns.findIndex(p => p.name === pattern.name);
+    const existingIndex = patterns.findIndex((p) => p.name === pattern.name);
 
     if (existingIndex >= 0) {
       patterns[existingIndex] = pattern;
@@ -148,7 +154,7 @@ function savePattern(): void {
   renderSavedPatterns();
   setInputValue("savedPatterns", pattern.name);
 
-  showMessage("Patternul a fost salvat.");
+  showMessage("The pattern was saved.");
 }
 
 function renderSavedPatterns(): void {
@@ -164,13 +170,13 @@ function renderSavedPatterns(): void {
 
   if (patterns.length === 0) {
     const option = document.createElement("option");
-    option.textContent = "Nu există patternuri salvate";
+    option.textContent = "No saved patterns";
     option.value = "";
     select.appendChild(option);
     return;
   }
 
-  patterns.forEach(pattern => {
+  patterns.forEach((pattern) => {
     const option = document.createElement("option");
     option.value = pattern.name;
     option.textContent = pattern.name;
@@ -186,7 +192,7 @@ function getSelectedPattern(): TextPattern | null {
   }
 
   const patterns = getPatterns();
-  return patterns.find(pattern => pattern.name === selectedName) ?? null;
+  return patterns.find((pattern) => pattern.name === selectedName) ?? null;
 }
 
 async function readFormattingFromSelection(): Promise<void> {
@@ -194,10 +200,13 @@ async function readFormattingFromSelection(): Promise<void> {
     await Word.run(async (context) => {
       const selection = context.document.getSelection();
 
-      selection.font.load("name,size,bold,italic");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      selection.load("font/name,font/size,font/bold,font/italic,paragraphs");
+
+      await context.sync();
 
       const paragraphs = selection.paragraphs;
-      paragraphs.load("items");
+      paragraphs.load("items/alignment,items/lineSpacing");
 
       await context.sync();
 
@@ -206,11 +215,6 @@ async function readFormattingFromSelection(): Promise<void> {
 
       if (paragraphs.items.length > 0) {
         const firstParagraph = paragraphs.items[0];
-
-        firstParagraph.load("alignment,lineSpacing");
-
-        await context.sync();
-
         alignment = firstParagraph.alignment as AlignmentValue;
         lineSpacing = convertWordPointsToLineSpacing(firstParagraph.lineSpacing || 12);
       }
@@ -221,7 +225,7 @@ async function readFormattingFromSelection(): Promise<void> {
       const italic = selection.font.italic === true;
 
       if (!getInputValue("patternName").trim()) {
-        setInputValue("patternName", "Pattern din selecție");
+        setInputValue("patternName", "Pattern from selection");
       }
 
       setInputValue("fontName", fontName);
@@ -231,10 +235,10 @@ async function readFormattingFromSelection(): Promise<void> {
       setCheckboxValue("bold", bold);
       setCheckboxValue("italic", italic);
 
-      showMessage("Formatările au fost preluate din textul selectat.");
+      showMessage("Formatting was read from the selected text.");
     });
   } catch (error) {
-    showMessage("Nu am putut prelua formatarea din selecție.");
+    showMessage("Could not read formatting from the selection.");
     console.error(error);
   }
 }
@@ -243,7 +247,7 @@ async function applySelectedPattern(): Promise<void> {
   const pattern = getSelectedPattern();
 
   if (!pattern) {
-    showMessage("Alege un pattern salvat.");
+    showMessage("Choose a saved pattern.");
     return;
   }
 
@@ -255,13 +259,17 @@ async function applySelectedPattern(): Promise<void> {
       selection.font.size = pattern.fontSize;
       selection.font.bold = pattern.bold;
       selection.font.italic = pattern.italic;
+      // eslint-disable-next-line office-addins/no-navigational-load
+      selection.load("paragraphs");
+
+      await context.sync();
 
       const paragraphs = selection.paragraphs;
       paragraphs.load("items");
 
       await context.sync();
 
-      paragraphs.items.forEach(paragraph => {
+      paragraphs.items.forEach((paragraph) => {
         paragraph.alignment = pattern.alignment as Word.Alignment;
         paragraph.lineSpacing = convertLineSpacingToWordPoints(pattern.lineSpacing);
       });
@@ -269,9 +277,9 @@ async function applySelectedPattern(): Promise<void> {
       await context.sync();
     });
 
-    showMessage("Patternul a fost aplicat pe textul selectat.");
+    showMessage("The pattern was applied to the selected text.");
   } catch (error) {
-    showMessage("A apărut o eroare la aplicarea patternului.");
+    showMessage("An error occurred while applying the pattern.");
     console.error(error);
   }
 }
@@ -304,16 +312,16 @@ function deleteSelectedPattern(): void {
   const selectedName = getInputValue("savedPatterns");
 
   if (!selectedName) {
-    showMessage("Alege un pattern pentru ștergere.");
+    showMessage("Choose a pattern to delete.");
     return;
   }
 
   const patterns = getPatterns();
-  const updatedPatterns = patterns.filter(pattern => pattern.name !== selectedName);
+  const updatedPatterns = patterns.filter((pattern) => pattern.name !== selectedName);
 
   savePatterns(updatedPatterns);
   renderSavedPatterns();
   editingPatternName = null;
 
-  showMessage("Patternul a fost șters.");
+  showMessage("The pattern was deleted.");
 }

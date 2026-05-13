@@ -82,15 +82,41 @@ function switchTab(tab: "new" | "saved"): void {
   const savedPanel = document.getElementById("savedPatternsPanel");
   const isNew = tab === "new";
 
-  newTab?.classList.toggle("active", isNew);
-  savedTab?.classList.toggle("active", !isNew);
+  setElementActive(newTab, isNew);
+  setElementActive(savedTab, !isNew);
+  setElementActive(newPanel, isNew);
+  setElementActive(savedPanel, !isNew);
+  setElementHidden(newPanel, !isNew);
+  setElementHidden(savedPanel, isNew);
   newTab?.setAttribute("aria-selected", String(isNew));
   savedTab?.setAttribute("aria-selected", String(!isNew));
-  newPanel?.classList.toggle("active", isNew);
-  savedPanel?.classList.toggle("active", !isNew);
-  newPanel?.toggleAttribute("hidden", !isNew);
-  savedPanel?.toggleAttribute("hidden", isNew);
   localStorage.setItem(LAST_TAB_KEY, tab);
+}
+
+function setElementActive(element: HTMLElement | null, isActive: boolean): void {
+  if (!element) {
+    return;
+  }
+
+  if (isActive) {
+    element.classList.add("active");
+  } else {
+    element.classList.remove("active");
+  }
+}
+
+function setElementHidden(element: HTMLElement | null, isHidden: boolean): void {
+  if (!element) {
+    return;
+  }
+
+  if (isHidden) {
+    element.setAttribute("hidden", "hidden");
+    element.style.display = "none";
+  } else {
+    element.removeAttribute("hidden");
+    element.style.display = "";
+  }
 }
 
 function loadSelectedPatternForEditing(): void {

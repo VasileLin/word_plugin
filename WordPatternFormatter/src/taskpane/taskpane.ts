@@ -1,4 +1,4 @@
-/* global Office, Word, document, HTMLInputElement, HTMLSelectElement, HTMLElement, localStorage, console, Blob, URL, FileReader, setTimeout */
+/* global Office, Word, document, HTMLInputElement, HTMLSelectElement, HTMLElement, localStorage, console, Blob, URL, FileReader, setTimeout, Event */
 
 type AlignmentValue = "Left" | "Centered" | "Right" | "Justified";
 
@@ -25,6 +25,7 @@ const LAST_TAB_KEY = "word_text_patterns_last_tab";
 const LAST_SCOPE_KEY = "word_text_patterns_last_scope";
 const SORT_KEY = "word_text_patterns_sort";
 let editingPatternName: string | null = null;
+let lastDeleteActionAt = 0;
 
 Office.onReady(() => {
   initializeDefaultPatterns();
@@ -39,7 +40,12 @@ Office.onReady(() => {
   document.getElementById("clearFormButton")?.addEventListener("click", clearForm);
   document.getElementById("savePatternButton")?.addEventListener("click", savePattern);
   document.getElementById("applyPatternButton")?.addEventListener("click", applySelectedPattern);
-  document.getElementById("deletePatternButton")?.addEventListener("click", deleteSelectedPattern);
+  document
+    .getElementById("deletePatternButton")
+    ?.addEventListener("click", requestDeleteSelectedPattern);
+  document
+    .getElementById("deletePatternButton")
+    ?.addEventListener("pointerup", requestDeleteSelectedPattern);
   document.getElementById("exportPatternsButton")?.addEventListener("click", exportPatterns);
   document.getElementById("importPatternsButton")?.addEventListener("click", openImportDialog);
   document.getElementById("resetDefaultsButton")?.addEventListener("click", resetDefaultPatterns);
@@ -472,7 +478,7 @@ function persistApplyScope(): void {
 }
 
 function getSelectedPattern(): TextPattern | null {
-  const selectedName = getInputValue("savedPatterns");
+  const selectedName = getSelectedPatternName();
 
   if (!selectedName) {
     return null;
@@ -480,6 +486,17 @@ function getSelectedPattern(): TextPattern | null {
 
   const patterns = getPatterns();
   return patterns.find((pattern) => pattern.name === selectedName) ?? null;
+}
+
+function getSelectedPatternName(): string {
+  const select = document.getElementById("savedPatterns") as HTMLSelectElement;
+
+  if (!select || select.selectedIndex < 0) {
+    return "";
+  }
+
+  const selectedOption = select.options[select.selectedIndex];
+  return selectedOption?.value || select.value || "";
 }
 
 function updatePatternPreview(): void {
@@ -792,6 +809,19 @@ function normalizeHighlightColor(value: string | undefined): string {
   return value;
 }
 
+function requestDeleteSelectedPattern(event?: Event): void {
+  event?.preventDefault();
+
+  const now = Date.now();
+
+  if (now - lastDeleteActionAt < 400) {
+    return;
+  }
+
+  lastDeleteActionAt = now;
+  deleteSelectedPattern();
+}
+
 function deleteSelectedPattern(): void {
   const pattern = getSelectedPattern();
 
@@ -802,6 +832,11 @@ function deleteSelectedPattern(): void {
 
   const patterns = getPatterns();
   const updatedPatterns = patterns.filter((savedPattern) => savedPattern.name !== pattern.name);
+
+  if (updatedPatterns.length === patterns.length) {
+    showMessage(`Could not find "${pattern.name}" in saved patterns.`);
+    return;
+  }
 
   savePatterns(updatedPatterns);
   renderSavedPatterns();

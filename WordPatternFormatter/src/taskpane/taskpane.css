@@ -78,6 +78,7 @@ body {
     background: var(--panel);
     color: var(--text);
     box-shadow: 0 1px 4px rgba(30, 37, 43, 0.12);
+    outline: 1px solid rgba(30, 37, 43, 0.06);
 }
 
 .panel {
@@ -336,4 +337,71 @@ select:focus {
     color: var(--muted);
     font-size: 11px;
     font-weight: 700;
+}
+
+@media (max-width: 460px) {
+    .app {
+        min-width: 0;
+        padding: 10px;
+    }
+
+    .header {
+        padding: 0 2px 12px;
+    }
+
+    .header h1 {
+        font-size: 22px;
+    }
+
+    .tabs {
+        gap: 3px;
+        padding: 3px;
+        margin-bottom: 10px;
+    }
+
+    .tab {
+        min-height: 42px;
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+
+    .panel {
+        padding: 14px;
+        box-shadow: 0 4px 14px rgba(30, 37, 43, 0.08);
+    }
+
+    .grid,
+    .paragraph-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .options {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .button,
+    input,
+    select {
+        min-height: 42px;
+        font-size: 14px;
+    }
+
+    .preview {
+        padding: 10px;
+    }
+
+    .preview-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .preview-chip {
+        overflow: hidden;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }

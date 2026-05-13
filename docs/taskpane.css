@@ -15,8 +15,10 @@
 body {
     margin: 0;
     padding: 0;
+    background: #f4f2ee;
     background: var(--bg);
     font-family: "Segoe UI", Arial, sans-serif;
+    color: #1e252b;
     color: var(--text);
 }
 
@@ -31,6 +33,7 @@ body {
 
 .eyebrow {
     margin: 0 0 6px;
+    color: #176b5d;
     color: var(--primary);
     font-size: 12px;
     font-weight: 700;
@@ -46,28 +49,36 @@ body {
 
 .header p {
     margin: 8px 0 0;
+    color: #66717c;
     color: var(--muted);
     font-size: 13px;
     line-height: 1.45;
 }
 
 .tabs {
+    display: -ms-flexbox;
+    display: flex;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
     padding: 4px;
     margin-bottom: 12px;
+    border: 1px solid #dfe3e6;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: #ebe8e2;
 }
 
 .tab {
+    -ms-flex: 1 1 0;
+    flex: 1 1 0;
     min-height: 38px;
+    margin: 0 2px;
     padding: 8px 10px;
     border: 0;
     border-radius: 6px;
     background: transparent;
+    color: #66717c;
     color: var(--muted);
     font-size: 13px;
     font-weight: 700;
@@ -75,7 +86,9 @@ body {
 }
 
 .tab.active {
+    background: #ffffff;
     background: var(--panel);
+    color: #1e252b;
     color: var(--text);
     box-shadow: 0 1px 4px rgba(30, 37, 43, 0.12);
     outline: 1px solid rgba(30, 37, 43, 0.06);
@@ -83,8 +96,10 @@ body {
 
 .panel {
     padding: 16px;
+    border: 1px solid #dfe3e6;
     border: 1px solid var(--border);
     border-radius: 8px;
+    background: #ffffff;
     background: var(--panel);
     box-shadow: 0 8px 22px rgba(30, 37, 43, 0.08);
 }
@@ -105,6 +120,7 @@ body {
 
 .section-heading p {
     margin: 6px 0 14px;
+    color: #66717c;
     color: var(--muted);
     font-size: 13px;
     line-height: 1.4;
@@ -128,6 +144,7 @@ select {
     border: 1px solid #cfd6dc;
     border-radius: 6px;
     background: #ffffff;
+    color: #1e252b;
     color: var(--text);
     font-size: 14px;
     outline: none;
@@ -135,37 +152,78 @@ select {
 
 input:focus,
 select:focus {
+    border-color: #176b5d;
     border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(23, 107, 93, 0.16);
     box-shadow: 0 0 0 3px var(--focus);
 }
 
 .grid {
+    display: -ms-flexbox;
+    display: flex;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 82px;
     gap: 10px;
 }
 
+.grid > div {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    margin-right: 10px;
+}
+
+.grid > div:last-child {
+    -ms-flex: 0 0 82px;
+    flex: 0 0 82px;
+    width: 82px;
+    margin-right: 0;
+}
+
 .options {
+    display: -ms-flexbox;
+    display: flex;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
     margin-top: 14px;
 }
 
+.options .check {
+    -ms-flex: 1 1 0;
+    flex: 1 1 0;
+    margin-right: 10px;
+}
+
+.options .check:last-child {
+    margin-right: 0;
+}
+
 .paragraph-grid {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
 }
 
+.paragraph-grid > div {
+    -ms-flex: 0 0 48%;
+    flex: 0 0 48%;
+    margin-right: 10px;
+}
+
 .advanced {
     margin-top: 14px;
     padding: 0 0 12px;
+    border-bottom: 1px solid #dfe3e6;
     border-bottom: 1px solid var(--border);
 }
 
 .advanced summary {
     cursor: pointer;
+    color: #26313a;
     color: var(--secondary);
     font-size: 13px;
     font-weight: 750;
@@ -179,6 +237,7 @@ select:focus {
     padding: 8px 10px;
     margin: 0;
     box-sizing: border-box;
+    border: 1px solid #dfe3e6;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: #f8faf9;
@@ -191,16 +250,34 @@ select:focus {
 }
 
 .actions {
+    display: block;
     display: grid;
     gap: 10px;
     margin-top: 16px;
 }
 
+.actions .button {
+    margin-top: 10px;
+}
+
+.actions .button:first-child {
+    margin-top: 0;
+}
+
 .utility-actions {
+    display: block;
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px;
     margin-top: 14px;
+}
+
+.utility-actions .button {
+    margin-top: 10px;
+}
+
+.utility-actions .button:first-child {
+    margin-top: 0;
 }
 
 .file-input {
@@ -220,14 +297,17 @@ select:focus {
 }
 
 .primary {
+    background: #176b5d;
     background: var(--primary);
 }
 
 .primary:hover {
+    background: #0f4f45;
     background: var(--primary-strong);
 }
 
 .secondary {
+    background: #26313a;
     background: var(--secondary);
 }
 
@@ -236,8 +316,10 @@ select:focus {
 }
 
 .ghost {
+    border: 1px solid #dfe3e6;
     border: 1px solid var(--border);
     background: #ffffff;
+    color: #26313a;
     color: var(--secondary);
 }
 
@@ -246,6 +328,7 @@ select:focus {
 }
 
 .danger {
+    background: #b42318;
     background: var(--danger);
 }
 
@@ -256,6 +339,7 @@ select:focus {
 .message {
     min-height: 20px;
     margin: 12px 2px 0;
+    color: #176b5d;
     color: var(--primary);
     font-size: 13px;
     font-weight: 700;
@@ -268,6 +352,7 @@ select:focus {
     bottom: 16px;
     left: 16px;
     z-index: 20;
+    display: block;
     display: grid;
     gap: 8px;
     pointer-events: none;
@@ -276,6 +361,7 @@ select:focus {
 .toast {
     padding: 10px 12px;
     border-radius: 8px;
+    background: #26313a;
     background: var(--secondary);
     color: #ffffff;
     box-shadow: 0 8px 22px rgba(30, 37, 43, 0.18);
@@ -305,6 +391,7 @@ select:focus {
 .preview {
     margin-top: 14px;
     padding: 12px;
+    border: 1px solid #dfe3e6;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: #fafbf9;
@@ -312,6 +399,7 @@ select:focus {
 
 .preview-empty {
     margin: 0;
+    color: #66717c;
     color: var(--muted);
     font-size: 13px;
     font-weight: 700;
@@ -319,6 +407,7 @@ select:focus {
 
 .preview-sample {
     margin: 0 0 10px;
+    color: #1e252b;
     color: var(--text);
     line-height: 1.35;
 }
@@ -330,13 +419,36 @@ select:focus {
 }
 
 .preview-chip {
+    display: inline-block;
+    margin: 3px;
     padding: 4px 7px;
+    border: 1px solid #dfe3e6;
     border: 1px solid var(--border);
     border-radius: 999px;
     background: #ffffff;
+    color: #66717c;
     color: var(--muted);
     font-size: 11px;
     font-weight: 700;
+}
+
+@supports (display: grid) {
+    .tab,
+    .grid > div,
+    .options .check,
+    .paragraph-grid > div,
+    .preview-chip {
+        margin: 0;
+    }
+
+    .grid > div:last-child {
+        width: auto;
+    }
+
+    .actions .button,
+    .utility-actions .button {
+        margin-top: 0;
+    }
 }
 
 @media (max-width: 460px) {

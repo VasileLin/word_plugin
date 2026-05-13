@@ -2,15 +2,15 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
   <Id>a6578af7-02c0-4edf-8f1d-93ed1b3ed0a9</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Contoso</ProviderName>
+  <ProviderName>Vasile Lin</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="WordPatternFormatter"/>
-  <Description DefaultValue="A template to get started."/>
-  <IconUrl DefaultValue="https://www.contoso.com/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://www.contoso.com/assets/icon-64.png"/>
-  <SupportUrl DefaultValue="https://www.contoso.com/help"/>
+  <Description DefaultValue="Save and apply reusable text formatting patterns in Microsoft Word."/>
+  <IconUrl DefaultValue="https://vasilelin.github.io/word_plugin/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://vasilelin.github.io/word_plugin/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="https://vasilelin.github.io/word_plugin/"/>
   <AppDomains>
-    <AppDomain>https://www.contoso.com</AppDomain>
+    <AppDomain>https://vasilelin.github.io</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document"/>
@@ -62,9 +62,9 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://www.contoso.com/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://www.contoso.com/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://www.contoso.com/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://vasilelin.github.io/word_plugin/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://vasilelin.github.io/word_plugin/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://vasilelin.github.io/word_plugin/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812"/>
@@ -72,13 +72,13 @@
         <bt:Url id="Taskpane.Url" DefaultValue="https://vasilelin.github.io/word_plugin/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="Get started with your sample add-in!"/>
-        <bt:String id="CommandsGroup.Label" DefaultValue="Commands Group"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
+        <bt:String id="GetStarted.Title" DefaultValue="Word Pattern Formatter is ready"/>
+        <bt:String id="CommandsGroup.Label" DefaultValue="Pattern Formatter"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Open formatter"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="GetStarted.Description" DefaultValue="Your sample add-in loaded successfully. Go to the HOME tab and click the 'Show Task Pane' button to get started."/>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show a Taskpane"/>
+        <bt:String id="GetStarted.Description" DefaultValue="Open the task pane from the Home tab to save and apply formatting patterns."/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Open the Word Pattern Formatter task pane"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

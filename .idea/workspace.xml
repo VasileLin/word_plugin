@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e46311b7-4744-4f52-8825-bb4d27fff891" name="Changes" comment="Initial Commit">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WordPatternFormatter/manifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/WordPatternFormatter/manifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WordPatternFormatter/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/WordPatternFormatter/webpack.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +68,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1778654399792</updated>
-      <workItem from="1778654400843" duration="4416000" />
+      <workItem from="1778654400843" duration="4972000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <option name="closed" value="true" />

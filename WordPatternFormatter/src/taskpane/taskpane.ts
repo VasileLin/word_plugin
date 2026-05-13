@@ -17,7 +17,10 @@ let editingPatternName: string | null = null;
 
 Office.onReady(() => {
   renderSavedPatterns();
+  setupTabs();
 
+  document.getElementById("newPatternTab")?.addEventListener("click", () => switchTab("new"));
+  document.getElementById("savedPatternsTab")?.addEventListener("click", () => switchTab("saved"));
   document
     .getElementById("readSelectionButton")
     ?.addEventListener("click", readFormattingFromSelection);
@@ -28,6 +31,27 @@ Office.onReady(() => {
     .getElementById("editPatternButton")
     ?.addEventListener("click", loadSelectedPatternForEditing);
 });
+
+function setupTabs(): void {
+  switchTab("new");
+}
+
+function switchTab(tab: "new" | "saved"): void {
+  const newTab = document.getElementById("newPatternTab");
+  const savedTab = document.getElementById("savedPatternsTab");
+  const newPanel = document.getElementById("newPatternPanel");
+  const savedPanel = document.getElementById("savedPatternsPanel");
+  const isNew = tab === "new";
+
+  newTab?.classList.toggle("active", isNew);
+  savedTab?.classList.toggle("active", !isNew);
+  newTab?.setAttribute("aria-selected", String(isNew));
+  savedTab?.setAttribute("aria-selected", String(!isNew));
+  newPanel?.classList.toggle("active", isNew);
+  savedPanel?.classList.toggle("active", !isNew);
+  newPanel?.toggleAttribute("hidden", !isNew);
+  savedPanel?.toggleAttribute("hidden", isNew);
+}
 
 function loadSelectedPatternForEditing(): void {
   const pattern = getSelectedPattern();
@@ -47,6 +71,7 @@ function loadSelectedPatternForEditing(): void {
   setCheckboxValue("bold", pattern.bold);
   setCheckboxValue("italic", pattern.italic);
 
+  switchTab("new");
   showMessage("The pattern was loaded for editing.");
 }
 
@@ -153,6 +178,7 @@ function savePattern(): void {
   savePatterns(patterns);
   renderSavedPatterns();
   setInputValue("savedPatterns", pattern.name);
+  switchTab("saved");
 
   showMessage("The pattern was saved.");
 }
